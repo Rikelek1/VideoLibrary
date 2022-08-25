@@ -15,7 +15,11 @@ namespace VideoLibraryMVC.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            HomeModel model = new HomeModel();
+
+            model.UserName = "Rikki Lanouette";
+
+            return View(model);
         }
 
         public IActionResult Privacy()
