@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using VideoLibraryMVC.Data;
+using VideoLibraryMVC.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 

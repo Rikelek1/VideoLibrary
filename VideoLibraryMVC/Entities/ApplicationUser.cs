@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace VideoLibraryMVC.Data
+namespace VideoLibraryMVC.Entities
 {
     public class ApplicationUser : IdentityUser
     {

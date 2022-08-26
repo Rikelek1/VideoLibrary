@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using VideoLibraryMVC.Entities;
 using VideoLibraryMVC.Models;
 
 namespace VideoLibraryMVC.Controllers
