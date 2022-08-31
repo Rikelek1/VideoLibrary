@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VideoLibraryMVC.Data;
 using VideoLibraryMVC.Entities;
+using VideoLibraryMVC.ViewModels;
 
 namespace VideoLibraryMVC.Controllers
 {
@@ -20,9 +22,16 @@ namespace VideoLibraryMVC.Controllers
         // GET: Videos
         public async Task<IActionResult> Index()
         {
-              return _context.Videos != null ? 
-                          View(await _context.Videos.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Videos'  is null.");
+            VideosIndexViewModel model = new();
+
+            var users = await _context.Users.ToListAsync();            
+            
+            model.Videos = await _context.Videos.ToListAsync();
+            model.Users = users.Select(u => new SelectListItem(u.Salutation, u.Id));
+
+            return model.Videos != null ? 
+                        View(model) :
+                        Problem("Entity set 'ApplicationDbContext.Videos'  is null.");
         }
 
         // GET: Videos/Details/5
@@ -153,6 +162,23 @@ namespace VideoLibraryMVC.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BookVideo(int videoId, string userId)
+        {
+            var video = await _context.Videos.FirstOrDefaultAsync(video => video.Id == videoId);
+            var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == userId);
+
+            if (user != null && video != null)
+            {
+                user.Videos.Add(video);
+                video.Stock--;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return View(nameof(Index));
+        }
         private bool VideoExists(int id)
         {
           return (_context.Videos?.Any(e => e.Id == id)).GetValueOrDefault();

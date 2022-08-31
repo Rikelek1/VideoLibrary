@@ -11,5 +11,6 @@ namespace VideoLibraryMVC.Entities
         public int Year { get; set; }
         public int Rating { get; set; }
         public int Stock { get; set; }
+        public virtual List<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
     }
 }

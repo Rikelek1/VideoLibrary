@@ -6,5 +6,6 @@ namespace VideoLibraryMVC.Entities
     {
         public string? Salutation { get; set; }
         public int? Age { get; set; }
+        public virtual List<Video> Videos { get; set; }
     }
 }
