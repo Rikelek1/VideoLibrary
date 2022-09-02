@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VideoLibraryMVC.Data;
 using VideoLibraryMVC.Entities;
+using VideoLibraryMVC.Services;
+using VideoLibraryMVC.Services.Interfaces;
 using VideoLibraryMVC.ViewModels;
 
 namespace VideoLibraryMVC.Controllers
@@ -12,10 +14,12 @@ namespace VideoLibraryMVC.Controllers
     public class VideosController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private IVideoService _videoService;
 
-        public VideosController(ApplicationDbContext context)
+        public VideosController(ApplicationDbContext context, IVideoService videoService)
         {
             _context = context;
+            _videoService = videoService;
         }
 
         [AllowAnonymous]
@@ -24,7 +28,7 @@ namespace VideoLibraryMVC.Controllers
         {
             VideosIndexViewModel model = new();
 
-            var users = await _context.Users.ToListAsync();            
+            var users = _videoService.GetAllUsers();
             
             model.Videos = await _context.Videos.ToListAsync();
             model.Users = users.Select(u => new SelectListItem(u.Salutation, u.Id));
@@ -164,10 +168,10 @@ namespace VideoLibraryMVC.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> BookVideo(int videoId, string userId)
+        public async Task<IActionResult> BookVideo([Bind("VideoId,UserId")] BookVideoViewModel model)
         {
-            var video = await _context.Videos.FirstOrDefaultAsync(video => video.Id == videoId);
-            var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == userId);
+            var video = await _context.Videos.Include(video => video.Users).FirstOrDefaultAsync(video => video.Id == model.VideoId);
+            var user = await _context.Users.Include(user => user.Videos).FirstOrDefaultAsync(user => user.Id == model.UserId);
 
             if (user != null && video != null)
             {
@@ -177,7 +181,7 @@ namespace VideoLibraryMVC.Controllers
 
             await _context.SaveChangesAsync();
 
-            return View(nameof(Index));
+            return RedirectToAction(nameof(Index));
         }
         private bool VideoExists(int id)
         {

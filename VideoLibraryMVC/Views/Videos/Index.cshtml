@@ -53,10 +53,13 @@
                 @Html.DisplayFor(modelItem => item.Stock)
             </td>
             <td>
-                @Html.DropDownListFor(model => model.UserId, Model.Users)
+                <form id="bookVideoForm@(item.Id)" asp-controller="Videos" asp-action="BookVideo">
+                    @Html.DropDownListFor(model => model.UserId, Model.Users)
+                    @Html.Hidden("VideoId", item.Id)
+                </form>
             </td>
             <td>
-                <a asp-action="BookVideo" asp-route-videoId="@item.Id" asp-route-userId="@Model.UserId">Book</a> |
+                <input type="submit" form="bookVideoForm@(item.Id)" value="Book" /> |
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
